@@ -2,28 +2,37 @@ package com.restfood.restapi;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.net.URI;
 
 public class DBConnection {
-    private static final String IP = "192.168.56.1";
-    private static final String PORT = "50059";
-    private static final String DATABASE = "Restaurant";
-    private static final String USERNAME = "Fornite";
-    private static final String PASSWORD = "Juan123";
-
     public static Connection getConnection() {
-        Connection conexion = null;
+        Connection connection = null;
+
         try {
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            String dbUrl = System.getenv("DATABASE_URL");
 
-            String connectionString = String.format(
-                    "jdbc:sqlserver://%s:%s;databaseName=%s;encrypt=false;user=%s;password=%s;",
-                    IP, PORT, DATABASE, USERNAME, PASSWORD
-            );
+            if (dbUrl == null || dbUrl.isEmpty()) {
+                throw new IllegalArgumentException("DATABASE_URL not set");
+            }
 
-            conexion = DriverManager.getConnection(connectionString);
+            // Parsear la URI del tipo: postgres://user:password@host:port/dbname
+            URI dbUri = new URI(dbUrl);
+
+            String username = dbUri.getUserInfo().split(":")[0];
+            String password = dbUri.getUserInfo().split(":")[1];
+            String dbUrlFormatted = String.format("jdbc:postgresql://%s:%d%s",
+                    dbUri.getHost(),
+                    dbUri.getPort(),
+                    dbUri.getPath());
+
+            // Establecer conexión
+            Class.forName("org.postgresql.Driver");
+            connection = DriverManager.getConnection(dbUrlFormatted, username, password);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return conexion;
+
+        return connection;
     }
 }
