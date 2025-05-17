@@ -14,11 +14,11 @@ public class LoginResponse {
     }
 
     public boolean isSuccess() { return success; }
-    public String getMessage() { return message; }
-    public String getRol() { return rol; }
-
     public void setSuccess(boolean success) { this.success = success; }
+
+    public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
+
+    public String getRol() { return rol; }
     public void setRol(String rol) { this.rol = rol; }
 }
-
